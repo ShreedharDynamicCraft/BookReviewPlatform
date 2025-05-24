@@ -1,0 +1,20 @@
+{
+  "name": "book-review-platform",
+  "version": "1.0.0",
+  "description": "A platform for book reviews and ratings",
+  "main": "index.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "server": "nodemon backend/server.js",
+    "client": "npm start --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install-deps": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "postinstall": "cd frontend && npm install"
+  },
+  "author": "Shreedhar",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.1"
+  }
+}

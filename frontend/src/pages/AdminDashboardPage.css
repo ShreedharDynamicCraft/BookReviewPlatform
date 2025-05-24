@@ -1,0 +1,191 @@
+.admin-dashboard {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+.admin-dashboard h1 {
+  margin-bottom: 30px;
+  color: #333;
+  text-align: center;
+}
+
+/* Tab navigation */
+.admin-tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.admin-tabs button {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.3s;
+}
+
+.admin-tabs button.active {
+  color: #4caf50;
+  border-bottom: 3px solid #4caf50;
+}
+
+/* Admin section headers */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.add-btn {
+  background-color: #4caf50;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.add-btn:hover {
+  background-color: #388e3c;
+}
+
+/* Tables */
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 30px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: white;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.admin-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+}
+
+.admin-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.view-btn,
+.edit-btn,
+.delete-btn {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.view-btn {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+}
+
+.edit-btn {
+  background-color: #FF9800;
+  color: white;
+  border: none;
+}
+
+.delete-btn {
+  background-color: #F44336;
+  color: white;
+  border: none;
+}
+
+.view-btn:hover {
+  background-color: #1976D2;
+}
+
+.edit-btn:hover {
+  background-color: #F57C00;
+}
+
+.delete-btn:hover {
+  background-color: #D32F2F;
+}
+
+/* Comment cell with text overflow */
+.comment-cell {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Loading and error states */
+.loading, .error {
+  padding: 20px;
+  text-align: center;
+  margin: 20px 0;
+  border-radius: 4px;
+}
+
+.loading {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.error {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .admin-tabs {
+    flex-direction: column;
+    border-bottom: none;
+  }
+  
+  .admin-tabs button {
+    width: 100%;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .admin-tabs button.active {
+    border-left: 3px solid #4caf50;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .add-btn {
+    margin-top: 10px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+}
