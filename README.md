@@ -2,7 +2,7 @@
 
 BookReview is a full-stack web application that allows users to discover, review, and share their thoughts on books. The platform features an intuitive interface with visually appealing book cards, user authentication, review capabilities, and an admin dashboard for content management.
 
-![BookReview Homepage](/public/images/screenshots/home.png)
+![BookReview Homepage](Landing%20page.png)
 
 ## Live Demo
 
@@ -11,19 +11,16 @@ BookReview is a full-stack web application that allows users to discover, review
 ## Screenshots
 
 ### Book Listing with Interactive Cards
-![Book Listing](/public/images/screenshots/book-listing.png)
+![Book Listing](Books%20list.png)
 
 ### Book Details & Reviews
-![Book Details](/public/images/screenshots/book-details.png)
+![Book Details](Review%20page.png)
 
 ### My Bookshelf Feature
-![My Bookshelf](/public/images/screenshots/bookshelf.png)
+![My Bookshelf](List-2.png)
 
 ### Admin Dashboard
-![Admin Dashboard](/public/images/screenshots/admin-dashboard.png)
-
-### Responsive Mobile Design
-![Mobile View](/public/images/screenshots/mobile-view.png)
+![Admin Dashboard](Admin-Dashboard.png)
 
 ## Features
 
@@ -203,4 +200,3 @@ book-review-platform/
 - `POST /api/users/login` - Login a user
 - `GET /api/users/:id` - Get user profile
 - `PUT /api/users/:id` - Update user profile
-# BookReviewPlatform
