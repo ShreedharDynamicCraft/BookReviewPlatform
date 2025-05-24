@@ -1,0 +1,72 @@
+/**
+ * API Configuration Service
+ * Centralizes API base URL configuration and provides utility methods for API calls
+ */
+
+// Get API base URL from environment variable or use default
+const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+
+/**
+ * Formats API URLs consistently
+ * @param {String} endpoint - API endpoint without leading slash
+ * @returns {String} - Complete URL
+ */
+export const getApiUrl = (endpoint) => {
+  // Remove any leading slash from the endpoint
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
+  return `${API_BASE_URL}/${cleanEndpoint}`;
+};
+
+/**
+ * Sends a request to the API with proper headers and error handling
+ * @param {String} endpoint - API endpoint
+ * @param {Object} options - Fetch options
+ * @param {String} token - Authentication token (optional)
+ * @returns {Promise<Object>} - Response data
+ */
+export const apiRequest = async (endpoint, options = {}, token = null) => {
+  const url = getApiUrl(endpoint);
+  
+  // Set up headers with authentication if token is provided
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token && { Authorization: `Bearer ${token}` }),
+    ...options.headers
+  };
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers
+    });
+    
+    // Check if response is JSON
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'API request failed');
+      }
+      
+      return data;
+    } else {
+      // Handle non-JSON responses
+      const text = await response.text();
+      
+      if (!response.ok) {
+        throw new Error(`API request failed: ${text}`);
+      }
+      
+      return { message: text };
+    }
+  } catch (error) {
+    console.error(`API request error for ${url}:`, error);
+    throw error;
+  }
+};
+
+export default {
+  getApiUrl,
+  apiRequest
+};
