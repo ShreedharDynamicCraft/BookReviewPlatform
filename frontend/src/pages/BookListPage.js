@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { motion, AnimatePresence } from 'framer-motion';
 import AuthContext from '../context/AuthContext';
+import { apiRequest } from '../services/apiConfig';
 
 // Create DebugPanel component to avoid importing it separately
 const DebugPanel = ({ data, title = "Debug Info" }) => {
@@ -490,15 +491,9 @@ const BookListPage = () => {
       
       // Add timestamp to avoid caching issues
       const timestamp = new Date().getTime();
-      // Remove limit to fetch all books (not just 10)
-      const response = await fetch(`/api/books?limit=0&timestamp=${timestamp}`);
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to fetch books');
-      }
-      
-      const data = await response.json();
+      // Use apiRequest utility with absolute URL
+      const data = await apiRequest(`books?limit=0&timestamp=${timestamp}`);
       
       if (!data.books || !Array.isArray(data.books)) {
         throw new Error('Invalid book data received');
@@ -540,6 +535,19 @@ const BookListPage = () => {
       console.error('Error fetching books:', err);
       setError(err.message || 'Failed to load books');
       toast.error('Failed to load books: ' + (err.message || 'Unknown error'));
+      
+      // Add mock data as fallback when API fails
+      const mockBooks = [
+        { _id: '1', title: 'The Mahabharata', author: 'Vyasa', rating: 5, numReviews: 1500, genre: 'Epic', coverImage: 'https://m.media-amazon.com/images/I/81JSM5lKj0L._AC_UF1000,1000_QL80_.jpg' },
+        { _id: '2', title: 'The God of Small Things', author: 'Arundhati Roy', rating: 4, numReviews: 1200, genre: 'Fiction', coverImage: 'https://m.media-amazon.com/images/I/71mytsXgpoL._AC_UF1000,1000_QL80_.jpg' },
+        { _id: '3', title: 'Shantaram', author: 'Gregory David Roberts', rating: 5, numReviews: 980, genre: 'Adventure', coverImage: 'https://m.media-amazon.com/images/I/71oYy4zf3iL._AC_UF1000,1000_QL80_.jpg' },
+        { _id: '4', title: 'A Fine Balance', author: 'Rohinton Mistry', rating: 4, numReviews: 750, genre: 'Historical Fiction', coverImage: 'https://m.media-amazon.com/images/I/61tz0rTu0NL._AC_UF1000,1000_QL80_.jpg' },
+        { _id: '5', title: 'Sacred Games', author: 'Vikram Chandra', rating: 4, numReviews: 890, genre: 'Thriller', coverImage: 'https://m.media-amazon.com/images/I/71xmODEk6SL._AC_UF1000,1000_QL80_.jpg' },
+        { _id: '6', title: 'The Rozabal Line', author: 'Ashwin Sanghi', rating: 4, numReviews: 650, genre: 'Historical Fiction', coverImage: 'https://m.media-amazon.com/images/I/81zo3Aj1gsL._AC_UF1000,1000_QL80_.jpg' },
+      ];
+      setBooks(mockBooks);
+      const uniqueGenres = [...new Set(mockBooks.filter(book => book.genre).map(book => book.genre))];
+      setGenres(uniqueGenres);
     } finally {
       setLoading(false);
     }

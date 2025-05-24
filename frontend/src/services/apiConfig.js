@@ -3,8 +3,10 @@
  * Centralizes API base URL configuration and provides utility methods for API calls
  */
 
-// Get API base URL from environment variable or use default
-const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
+// Get API base URL from environment variable or use the deployed Vercel URL as default
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://book-review-platform-wnr7.vercel.app/api';
+
+console.log('API Base URL:', API_BASE_URL);
 
 /**
  * Formats API URLs consistently
@@ -27,6 +29,8 @@ export const getApiUrl = (endpoint) => {
 export const apiRequest = async (endpoint, options = {}, token = null) => {
   const url = getApiUrl(endpoint);
   
+  console.log(`Making API request to: ${url}`);
+  
   // Set up headers with authentication if token is provided
   const headers = {
     'Content-Type': 'application/json',
@@ -35,22 +39,28 @@ export const apiRequest = async (endpoint, options = {}, token = null) => {
   };
   
   try {
-    console.log(`API request to: ${url}`);
     const response = await fetch(url, {
       ...options,
       headers
     });
     
+    console.log(`Response status: ${response.status}`);
+    
     // Check if response is JSON
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'API request failed');
+      try {
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'API request failed');
+        }
+        
+        return data;
+      } catch (jsonError) {
+        console.error('JSON parsing error:', jsonError);
+        throw new Error(`Failed to parse JSON: ${jsonError.message}`);
       }
-      
-      return data;
     } else {
       // Handle non-JSON responses
       const text = await response.text();
@@ -69,5 +79,6 @@ export const apiRequest = async (endpoint, options = {}, token = null) => {
 
 export default {
   getApiUrl,
-  apiRequest
+  apiRequest,
+  API_BASE_URL
 };

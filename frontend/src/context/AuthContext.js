@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { apiRequest, getApiUrl } from '../services/apiConfig';
 
 const AuthContext = createContext();
 
@@ -22,35 +23,26 @@ export const AuthProvider = ({ children }) => {
     }
   }, [userInfo]);
 
-  // Function to login user
+  // Function to login user with improved error handling
   const login = async (email, password) => {
     setLoading(true);
     setError(null);
     
     try {
-      // Send login request to backend
-      const response = await fetch('/api/users/login', {
+      const data = await apiRequest('users/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
       
-      const data = await response.json();
-      
-      // Check if login was successful
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-      
-      // Save user data and return it
       setUserInfo(data);
-      setLoading(false);
+      localStorage.setItem('userInfo', JSON.stringify(data));
       return data;
     } catch (err) {
-      // Handle errors
-      setError(err.message);
-      setLoading(false);
+      console.error('Login error:', err);
+      setError(err.message || 'Failed to login');
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -155,7 +147,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Add like/dislike book functionality
+  // Add like/dislike book functionality using apiRequest
   const toggleBookLike = async (bookId) => {
     try {
       if (!userInfo) {
@@ -179,8 +171,18 @@ export const AuthProvider = ({ children }) => {
       setUserInfo(updatedUserInfo);
       localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
       
-      // Check if backend API call is needed
-      // For now, we'll just return whether the book is now liked
+      // Make API call using apiRequest utility
+      try {
+        await apiRequest(`books/${bookId}/like`, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        });
+      } catch (apiError) {
+        console.log('API call failed but continuing with local state:', apiError);
+      }
+      
       return !isCurrentlyLiked;
     } catch (error) {
       console.error('Error toggling book like:', error);
