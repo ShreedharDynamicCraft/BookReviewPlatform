@@ -134,7 +134,6 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Create hardcoded admin user data with a properly formatted JWT token
-      // This token format must match what your backend expects
       const adminUserData = {
         _id: 'admin123456',
         name: 'Admin User',
@@ -142,15 +141,11 @@ export const AuthProvider = ({ children }) => {
         isAdmin: true,
         bio: 'System administrator',
         favoriteGenres: [],
-        // Simple JWT token with correct format (header.payload.signature)
         token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFkbWluMTIzNDU2IiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNjE2MTIzNDU2fQ.hMWGYzxcnNb7eTF5j6xc6LAZGGGNWxYIdrGIDpZk9eM',
         likedBooks: [], // Initialize empty likedBooks array
       };
       
-      // Save to localStorage
       localStorage.setItem('userInfo', JSON.stringify(adminUserData));
-      
-      // Update state
       setUserInfo(adminUserData);
       setError(null);
       return true;
