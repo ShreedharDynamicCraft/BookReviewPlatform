@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Book = require('../models/bookModel');
+const { protect } = require('../middleware/authMiddleware');
 
-// Get books by multiple IDs (bookshelf functionality)
-router.get('/', async (req, res) => {
+// Get books by IDs (for bookshelf functionality)
+router.get('/', protect, async (req, res) => {
   try {
     const { ids } = req.query;
     

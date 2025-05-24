@@ -11,6 +11,7 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
     },
     password: {
       type: String,
@@ -25,10 +26,19 @@ const userSchema = mongoose.Schema(
       type: String,
       default: '',
     },
-    favoriteGenres: {
-      type: [String],
-      default: [],
-    },
+    favoriteGenres: [String],
+    likedBooks: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Book',
+      },
+    ],
+    likedReviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Review',
+      },
+    ],
   },
   {
     timestamps: true,
@@ -48,4 +58,6 @@ userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-module.exports = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;

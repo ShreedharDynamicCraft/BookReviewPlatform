@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Review = require('./reviewModel');
 
 const bookSchema = mongoose.Schema(
   {
@@ -24,7 +25,6 @@ const bookSchema = mongoose.Schema(
     },
     coverImage: {
       type: String,
-      required: true,
     },
     featured: {
       type: Boolean,
@@ -32,12 +32,10 @@ const bookSchema = mongoose.Schema(
     },
     rating: {
       type: Number,
-      required: true,
       default: 0,
     },
     numReviews: {
       type: Number,
-      required: true,
       default: 0,
     },
   },
@@ -48,7 +46,6 @@ const bookSchema = mongoose.Schema(
 
 // Virtual method to calculate the real average rating
 bookSchema.methods.calculateRating = async function() {
-  const Review = mongoose.model('Review');
   const reviews = await Review.find({ book: this._id });
   
   if (reviews.length === 0) {
