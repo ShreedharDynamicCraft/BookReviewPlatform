@@ -6,7 +6,11 @@ BookReview is a full-stack web application that allows users to discover, review
 
 ## Live Demo
 
-[BookReview Live Demo](https://book-review-demo.netlify.app) 
+### Frontend
+[BookReview Frontend](https://book-review-platform-9ifh.vercel.app/)
+
+### Backend API
+[BookReview API](https://book-review-platform-wnr7.vercel.app/api)
 
 ## Screenshots
 
@@ -59,6 +63,21 @@ BookReview is a full-stack web application that allows users to discover, review
 - MongoDB (local installation or MongoDB Atlas account)
 - npm or yarn
 
+### Environment Variables
+
+#### Backend (.env)
+```
+PORT=5000
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+NODE_ENV=development
+```
+
+#### Frontend (.env)
+```
+REACT_APP_API_URL=https://your-vercel-app.vercel.app/api
+```
+
 ### Installation
 
 1. **Clone the repository**
@@ -74,13 +93,7 @@ BookReview is a full-stack web application that allows users to discover, review
    ```
 
 3. **Configure environment variables**
-   Create a `.env` file in the backend directory with the following:
-   ```
-   PORT=5000
-   MONGODB_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret
-   NODE_ENV=development
-   ```
+   Create a `.env` file in the backend directory with the provided variables.
 
 4. **Install frontend dependencies**
    ```bash
