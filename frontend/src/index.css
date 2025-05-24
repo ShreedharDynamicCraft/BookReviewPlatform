@@ -194,3 +194,105 @@ img {
   height: 100%;
   object-fit: cover;
 }
+
+/* Error details styling for debugging */
+.error-details {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f8f9fa;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.error-details h3 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.error-details pre {
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  color: #d32f2f;
+}
+
+/* Improved spinner for loading states */
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #3f51b5;
+  animation: spin 1s ease-in-out infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.retry-button {
+  padding: 10px 20px;
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.retry-button:hover {
+  background-color: #303f9f;
+}
+
+/* Book like button styling */
+.like-button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.like-button:hover {
+  background-color: #f1f1f1;
+}
+
+.like-button.liked {
+  background-color: #ffebee;
+  color: #e91e63;
+  border-color: #ffcdd2;
+}
+
+.like-button.liked:hover {
+  background-color: #fce4ec;
+}
+
+.like-button i {
+  margin-right: 8px;
+}
+
+/* Featured badge styling */
+.featured-badge {
+  display: inline-block;
+  background-color: #fff8e1;
+  color: #ff8f00;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  margin-top: 10px;
+}

@@ -31,10 +31,14 @@ export const apiRequest = async (endpoint, options = {}, token = null) => {
   
   console.log(`Making API request to: ${url}`);
   
+  // Get token from options or from the provided token parameter
+  const authToken = options.token || token || (localStorage.getItem('userInfo') ? 
+    JSON.parse(localStorage.getItem('userInfo')).token : null);
+  
   // Set up headers with authentication if token is provided
   const headers = {
     'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
+    ...(authToken && { Authorization: `Bearer ${authToken}` }),
     ...options.headers
   };
   
@@ -44,7 +48,17 @@ export const apiRequest = async (endpoint, options = {}, token = null) => {
       headers
     });
     
-    console.log(`Response status: ${response.status}`);
+    console.log(`Response status from ${url}: ${response.status}`);
+    console.log(`Response content-type: ${response.headers.get('content-type')}`);
+    
+    // For better debugging, log a preview of the response body
+    const responseClone = response.clone();
+    try {
+      const responsePreview = await responseClone.text();
+      console.log(`Response preview (first 200 chars): ${responsePreview.substring(0, 200)}`);
+    } catch (err) {
+      console.log('Could not preview response body');
+    }
     
     // Check if response is JSON
     const contentType = response.headers.get('content-type');
@@ -59,7 +73,7 @@ export const apiRequest = async (endpoint, options = {}, token = null) => {
         return data;
       } catch (jsonError) {
         console.error('JSON parsing error:', jsonError);
-        throw new Error(`Failed to parse JSON: ${jsonError.message}`);
+        throw new Error(`Failed to parse JSON response: ${jsonError.message}`);
       }
     } else {
       // Handle non-JSON responses

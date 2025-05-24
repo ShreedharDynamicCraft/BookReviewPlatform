@@ -153,13 +153,13 @@ const Header = () => {
               <div className="flex items-center space-x-3 ml-4">
                 <Link 
                   to="/login" 
-                  className="px-4 py-2 border border-primary-600 text-primary-700 rounded-full text-sm font-medium hover:bg-primary-50 transition-colors"
+                  className="px-4 py-2 bg-indigo-600 text-white border border-indigo-600 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-md"
                 >
-                  Sign in
+                  <i className="fas fa-sign-in-alt mr-1"></i> Sign in
                 </Link>
                 <Link 
                   to="/register" 
-                  className="px-4 py-2 bg-primary-600 text-white rounded-full text-sm font-medium hover:bg-primary-700 transition-colors shadow-md hover:shadow-lg"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors shadow-md hover:shadow-lg"
                 >
                   Get started
                 </Link>
@@ -249,9 +249,9 @@ const Header = () => {
             <div className="pt-4 pb-3 border-t border-gray-200 grid grid-cols-2 gap-2">
               <Link
                 to="/login"
-                className="px-4 py-2 border border-primary-600 text-primary-700 rounded-md text-base font-medium hover:bg-primary-50 transition-colors text-center"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md text-base font-medium hover:bg-indigo-700 transition-colors text-center shadow-md"
               >
-                Sign in
+                <i className="fas fa-sign-in-alt mr-1"></i> Sign in
               </Link>
               <Link
                 to="/register"

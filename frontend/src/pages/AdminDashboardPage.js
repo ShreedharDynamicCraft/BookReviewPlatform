@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import AuthContext from '../context/AuthContext';
+import { apiRequest } from '../services/apiConfig';
 import './AdminDashboardPage.css';
 
 const AdminDashboardPage = () => {
@@ -31,25 +32,22 @@ const AdminDashboardPage = () => {
       try {
         setLoading(true);
         
-        // fetch books data
-        const booksRes = await fetch('/api/books');
-        const booksData = await booksRes.json();
+        // fetch books data using apiRequest utility
+        const booksData = await apiRequest('books');
         
-        // fetch users data (admin only)
-        const usersRes = await fetch('/api/users', {
+        // fetch users data (admin only) using apiRequest utility
+        const usersData = await apiRequest('users', {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
           },
         });
-        const usersData = await usersRes.json();
         
-        // fetch all reviews (admin only)
-        const reviewsRes = await fetch('/api/reviews/all', {
+        // fetch all reviews (admin only) using apiRequest utility
+        const reviewsData = await apiRequest('reviews/all', {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
           },
         });
-        const reviewsData = await reviewsRes.json();
         
         setBooks(booksData.books || []);
         setUsers(usersData || []);
@@ -72,22 +70,17 @@ const AdminDashboardPage = () => {
   const handleDeleteBook = async (id) => {
     if (window.confirm('Are you sure you want to delete this book?')) {
       try {
-        const response = await fetch(`/api/books/${id}`, {
+        await apiRequest(`books/${id}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
           },
         });
         
-        if (response.ok) {
-          setBooks(books.filter(book => book._id !== id));
-          toast.success('Book deleted successfully');
-        } else {
-          const errorData = await response.json();
-          toast.error(errorData.message || 'Failed to delete book');
-        }
+        setBooks(books.filter(book => book._id !== id));
+        toast.success('Book deleted successfully');
       } catch (error) {
-        toast.error('Error deleting book');
+        toast.error(error.message || 'Error deleting book');
       }
     }
   };

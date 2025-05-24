@@ -2,60 +2,54 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import AuthContext from '../context/AuthContext';
-import './ProfilePage.css';
+import { userService } from '../services/api';
 
 const ProfilePage = () => {
-  const { id } = useParams();
-  const { userInfo, updateProfile, loading } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [editing, setEditing] = useState(false);
   
-  const [user, setUser] = useState(null);
+  // Form state
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [bio, setBio] = useState('');
-  const [favoriteGenres, setFavoriteGenres] = useState([]);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [editing, setEditing] = useState(false);
-  const [loadingUser, setLoadingUser] = useState(true);
-  const [error, setError] = useState(null);
   
-  // Check if current user is viewing their own profile
-  const isOwnProfile = userInfo && userInfo._id === id;
+  const { id } = useParams();
+  const { userInfo, updateProfile } = useContext(AuthContext);
+  const navigate = useNavigate();
+  
+  // Check if viewing own profile
+  const isOwnProfile = userInfo?._id === id;
   
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchProfile = async () => {
       try {
-        const response = await fetch(`/api/users/${id}`);
+        setLoading(true);
+        const data = await userService.getProfile(id);
+        setProfile(data);
         
-        if (!response.ok) {
-          throw new Error('Failed to fetch user profile');
-        }
-        
-        const data = await response.json();
-        setUser(data);
-        
-        if (isOwnProfile) {
-          setName(data.name || '');
-          setEmail(data.email || '');
-          setBio(data.bio || '');
-          setFavoriteGenres(data.favoriteGenres || []);
-        }
-        
+        // Set form data
+        setName(data.name || '');
+        setEmail(data.email || '');
+        setBio(data.bio || '');
       } catch (err) {
-        setError(err.message);
+        setError(err.message || 'Failed to load profile');
+        toast.error('Failed to load profile');
       } finally {
-        setLoadingUser(false);
+        setLoading(false);
       }
     };
     
-    fetchUserProfile();
-  }, [id, isOwnProfile]);
+    fetchProfile();
+  }, [id]);
   
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (password !== confirmPassword) {
+    if (password && password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
@@ -65,12 +59,8 @@ const ProfilePage = () => {
         name,
         email,
         bio,
-        favoriteGenres,
+        ...(password && { password }),
       };
-      
-      if (password) {
-        userData.password = password;
-      }
       
       await updateProfile(id, userData);
       setEditing(false);
@@ -80,147 +70,125 @@ const ProfilePage = () => {
     }
   };
   
-  if (loadingUser) {
-    return <div className="loading">Loading profile...</div>;
+  if (loading) {
+    return <div className="text-center py-10">Loading profile...</div>;
   }
   
   if (error) {
-    return <div className="error">{error}</div>;
-  }
-  
-  if (!user) {
-    return <div className="not-found">User not found</div>;
+    return (
+      <div className="text-center py-10">
+        <div className="text-red-600 mb-4">{error}</div>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+        >
+          Try Again
+        </button>
+      </div>
+    );
   }
   
   return (
-    <div className="profile-page">
-      <div className="profile-container">
-        <h1>{isOwnProfile ? 'My Profile' : `${user.name}'s Profile`}</h1>
+    <div className="max-w-3xl mx-auto py-10 px-4">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 py-6 px-8">
+          <h1 className="text-2xl font-bold text-white">{profile.name}'s Profile</h1>
+        </div>
         
-        {isOwnProfile && !editing ? (
-          <button 
-            className="edit-profile-btn"
-            onClick={() => setEditing(true)}
-          >
-            Edit Profile
-          </button>
-        ) : null}
-        
-        {isOwnProfile && editing ? (
-          <form onSubmit={handleSubmit} className="profile-form">
-            <div className="form-group">
-              <label htmlFor="name">Name</label>
-              <input
-                type="text"
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="bio">Bio</label>
-              <textarea
-                id="bio"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                rows="4"
-              ></textarea>
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="favoriteGenres">Favorite Genres (comma separated)</label>
-              <input
-                type="text"
-                id="favoriteGenres"
-                value={favoriteGenres.join(', ')}
-                onChange={(e) => setFavoriteGenres(e.target.value.split(',').map(genre => genre.trim()))}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="password">New Password (leave blank to keep current)</label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm New Password</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-            </div>
-            
-            <div className="profile-actions">
-              <button 
-                type="submit" 
-                className="save-btn"
-                disabled={loading}
-              >
-                {loading ? 'Saving...' : 'Save Changes'}
-              </button>
-              
-              <button 
-                type="button" 
-                className="cancel-btn"
-                onClick={() => setEditing(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        ) : (
-          <div className="profile-info">
-            <div className="info-group">
-              <h3>Name</h3>
-              <p>{user.name}</p>
-            </div>
-            
-            {isOwnProfile && (
-              <div className="info-group">
-                <h3>Email</h3>
-                <p>{user.email}</p>
+        <div className="p-8">
+          {editing ? (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block font-medium mb-1">Name</label>
+                <input 
+                  type="text" 
+                  value={name} 
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  required
+                />
               </div>
-            )}
-            
-            <div className="info-group">
-              <h3>Bio</h3>
-              <p>{user.bio || 'No bio provided'}</p>
-            </div>
-            
-            <div className="info-group">
-              <h3>Favorite Genres</h3>
-              {user.favoriteGenres && user.favoriteGenres.length > 0 ? (
-                <div className="genre-tags">
-                  {user.favoriteGenres.map((genre, index) => (
-                    <span key={index} className="genre-tag">{genre}</span>
-                  ))}
-                </div>
-              ) : (
-                <p>No favorite genres specified</p>
+              
+              <div>
+                <label className="block font-medium mb-1">Email</label>
+                <input 
+                  type="email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block font-medium mb-1">Bio</label>
+                <textarea 
+                  value={bio} 
+                  onChange={(e) => setBio(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  rows="4"
+                ></textarea>
+              </div>
+              
+              <div>
+                <label className="block font-medium mb-1">New Password (leave blank to keep current)</label>
+                <input 
+                  type="password" 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                />
+              </div>
+              
+              <div>
+                <label className="block font-medium mb-1">Confirm Password</label>
+                <input 
+                  type="password" 
+                  value={confirmPassword} 
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                />
+              </div>
+              
+              <div className="flex space-x-4">
+                <button 
+                  type="submit" 
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Save Changes
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setEditing(false)}
+                  className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div>
+              <div className="mb-6">
+                <h3 className="text-sm uppercase font-medium text-gray-500">Email</h3>
+                <p className="mt-1 text-lg">{profile.email}</p>
+              </div>
+              
+              <div className="mb-6">
+                <h3 className="text-sm uppercase font-medium text-gray-500">Bio</h3>
+                <p className="mt-1">{profile.bio || 'No bio provided'}</p>
+              </div>
+              
+              {isOwnProfile && (
+                <button 
+                  onClick={() => setEditing(true)}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Edit Profile
+                </button>
               )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

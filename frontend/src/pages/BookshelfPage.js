@@ -24,13 +24,16 @@ const BookshelfPage = () => {
         const ids = userInfo.likedBooks.join(',');
         console.log("Fetching books with IDs:", ids);
         
-        // Use apiRequest utility with the configured API URL
+        // Use apiRequest utility with the configured backend URL 
         const data = await apiRequest(`bookshelf?ids=${ids}`);
         console.log("Books fetched:", data);
         setLikedBooks(data);
       } catch (err) {
         console.error('Error fetching bookshelf:', err);
         setError(err.message || 'Failed to fetch your bookshelf');
+        
+        // Set empty array to avoid undefined errors
+        setLikedBooks([]);
       } finally {
         setLoading(false);
       }

@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, [userInfo]);
 
-  // Function to login user with improved error handling
+  // Function to login user
   const login = async (email, password) => {
     setLoading(true);
     setError(null);
@@ -35,7 +35,6 @@ export const AuthProvider = ({ children }) => {
       });
       
       setUserInfo(data);
-      localStorage.setItem('userInfo', JSON.stringify(data));
       return data;
     } catch (err) {
       console.error('Login error:', err);
@@ -52,35 +51,26 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     
     try {
-      // Send register request to backend
-      const response = await fetch('/api/users/register', {
+      const data = await apiRequest('users/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       });
       
-      const data = await response.json();
-      
-      // Check if registration was successful
-      if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
-      }
-      
-      // Save user data and return it
       setUserInfo(data);
-      setLoading(false);
       return data;
     } catch (err) {
-      // Handle errors
-      setError(err.message);
-      setLoading(false);
+      console.error('Registration error:', err);
+      setError(err.message || 'Failed to register');
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
   // Simple logout function that clears user data
   const logout = () => {
     setUserInfo(null);
+    localStorage.removeItem('userInfo');
   };
 
   // Function to update user profile data
@@ -89,43 +79,35 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     
     try {
-      // Need token for authorization
-      const response = await fetch(`/api/users/${userId}`, {
+      const data = await apiRequest(`users/${userId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userInfo.token}`, // Include JWT token for auth
-        },
         body: JSON.stringify(userData),
+        token: userInfo?.token
       });
       
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Update failed');
-      }
-      
-      // Update the user info with new data
-      setUserInfo({ ...userInfo, ...data });
-      setLoading(false);
+      setUserInfo(prev => ({
+        ...prev,
+        ...data
+      }));
       return data;
     } catch (err) {
-      setError(err.message);
-      setLoading(false);
+      console.error('Profile update error:', err);
+      setError(err.message || 'Failed to update profile');
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
   // Modified loginAsAdmin to include a secret code verification
   const loginAsAdmin = (secretCode) => {
     try {
-      // Verify the secret code (38)
       if (secretCode !== "38") {
         setError('Invalid admin secret code');
         return false;
       }
 
-      // Create hardcoded admin user data with a properly formatted JWT token
+      // Create hardcoded admin user data
       const adminUserData = {
         _id: 'admin123456',
         name: 'Admin User',
@@ -134,10 +116,9 @@ export const AuthProvider = ({ children }) => {
         bio: 'System administrator',
         favoriteGenres: [],
         token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFkbWluMTIzNDU2IiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNjE2MTIzNDU2fQ.hMWGYzxcnNb7eTF5j6xc6LAZGGGNWxYIdrGIDpZk9eM',
-        likedBooks: [], // Initialize empty likedBooks array
+        likedBooks: [],
       };
       
-      localStorage.setItem('userInfo', JSON.stringify(adminUserData));
       setUserInfo(adminUserData);
       setError(null);
       return true;
@@ -147,41 +128,35 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Add like/dislike book functionality using apiRequest
+  // Add like/dislike book functionality
   const toggleBookLike = async (bookId) => {
     try {
       if (!userInfo) {
         throw new Error('You must be logged in to like books');
       }
-
-      // Update in local state first for responsive UI
-      let updatedLikedBooks;
+      
+      // Optimistic update - assume the API call will succeed
       const isCurrentlyLiked = userInfo.likedBooks?.includes(bookId);
       
+      // Update local state first for better UX
+      let updatedLikedBooks = [...(userInfo.likedBooks || [])];
+      
       if (isCurrentlyLiked) {
-        // Remove bookId from likedBooks
-        updatedLikedBooks = userInfo.likedBooks.filter(id => id !== bookId);
+        updatedLikedBooks = updatedLikedBooks.filter(id => id !== bookId);
       } else {
-        // Add bookId to likedBooks
-        updatedLikedBooks = [...(userInfo.likedBooks || []), bookId];
+        updatedLikedBooks.push(bookId);
       }
       
-      // Update user info in state and localStorage
-      const updatedUserInfo = { ...userInfo, likedBooks: updatedLikedBooks };
-      setUserInfo(updatedUserInfo);
-      localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
+      setUserInfo(prev => ({
+        ...prev,
+        likedBooks: updatedLikedBooks
+      }));
       
-      // Make API call using apiRequest utility
-      try {
-        await apiRequest(`books/${bookId}/like`, {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        });
-      } catch (apiError) {
-        console.log('API call failed but continuing with local state:', apiError);
-      }
+      // Make the actual API call
+      await apiRequest(`books/${bookId}/like`, {
+        method: 'PUT',
+        token: userInfo.token
+      });
       
       return !isCurrentlyLiked;
     } catch (error) {
@@ -192,49 +167,21 @@ export const AuthProvider = ({ children }) => {
 
   // Add like comment functionality
   const toggleCommentLike = async (reviewId) => {
-    if (!userInfo) {
-      setError('Please login to like comments');
-      return false;
-    }
-
     try {
-      // Check if comment is already liked
-      const isLiked = userInfo.likedComments && userInfo.likedComments.includes(reviewId);
-      
-      // Create new array of liked comments
-      let updatedLikedComments;
-      
-      if (isLiked) {
-        // Remove from liked comments if already liked
-        updatedLikedComments = userInfo.likedComments.filter(id => id !== reviewId);
-      } else {
-        // Add to liked comments if not already liked
-        updatedLikedComments = [...(userInfo.likedComments || []), reviewId];
+      if (!userInfo) {
+        throw new Error('You must be logged in to like reviews');
       }
       
-      // Update user info with new liked comments array
-      const updatedUserInfo = {
-        ...userInfo,
-        likedComments: updatedLikedComments
-      };
+      // Make API call to like/unlike review
+      const data = await apiRequest(`reviews/${reviewId}/like`, {
+        method: 'PUT',
+        token: userInfo.token
+      });
       
-      setUserInfo(updatedUserInfo);
-      
-      // Call API to update likes in the backend
-      if (userInfo.token !== 'admin-token-123456') { // Skip API call for admin demo user
-        await fetch(`/api/reviews/${reviewId}/like`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${userInfo.token}`,
-          }
-        });
-      }
-      
-      return !isLiked; // Return new like state
-    } catch (err) {
-      setError(err.message);
-      return null;
+      return data;
+    } catch (error) {
+      console.error('Error toggling review like:', error);
+      throw error;
     }
   };
 

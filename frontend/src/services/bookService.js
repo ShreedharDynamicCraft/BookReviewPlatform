@@ -2,6 +2,7 @@
  * Book Service - Handles all API interactions related to books
  * This service centralizes API calls and provides consistent error handling
  */
+import { apiRequest } from './apiConfig';
 
 /**
  * Create a new book (admin only)
@@ -11,20 +12,11 @@
  */
 export const createBook = async (bookData, token) => {
   try {
-    const response = await fetch('/api/books', {
+    const data = await apiRequest('books', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
+      token,
       body: JSON.stringify(bookData)
     });
-    
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to create book');
-    }
     
     return data;
   } catch (error) {
@@ -42,20 +34,11 @@ export const createBook = async (bookData, token) => {
  */
 export const updateBook = async (id, bookData, token) => {
   try {
-    const response = await fetch(`/api/books/${id}`, {
+    const data = await apiRequest(`books/${id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
+      token,
       body: JSON.stringify(bookData)
     });
-    
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to update book');
-    }
     
     return data;
   } catch (error) {
@@ -72,18 +55,10 @@ export const updateBook = async (id, bookData, token) => {
  */
 export const deleteBook = async (id, token) => {
   try {
-    const response = await fetch(`/api/books/${id}`, {
+    const data = await apiRequest(`books/${id}`, {
       method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      token
     });
-    
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to delete book');
-    }
     
     return data;
   } catch (error) {
@@ -104,12 +79,7 @@ export const getBooks = async (params = {}) => {
       .map(([key, value]) => `${key}=${value}`)
       .join('&');
     
-    const response = await fetch(`/api/books?${queryString}`);
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch books');
-    }
+    const data = await apiRequest(`books?${queryString}`);
     
     return data;
   } catch (error) {
@@ -125,12 +95,7 @@ export const getBooks = async (params = {}) => {
  */
 export const getBookById = async (id) => {
   try {
-    const response = await fetch(`/api/books/${id}`);
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch book');
-    }
+    const data = await apiRequest(`books/${id}`);
     
     return data;
   } catch (error) {
@@ -145,12 +110,7 @@ export const getBookById = async (id) => {
  */
 export const getFeaturedBooks = async () => {
   try {
-    const response = await fetch('/api/books/featured');
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.message || 'Failed to fetch featured books');
-    }
+    const data = await apiRequest('books/featured');
     
     return data;
   } catch (error) {

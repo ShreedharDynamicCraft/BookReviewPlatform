@@ -492,7 +492,7 @@ const BookListPage = () => {
       // Add timestamp to avoid caching issues
       const timestamp = new Date().getTime();
       
-      // Use apiRequest utility with absolute URL
+      // Use apiRequest utility with the configured backend URL
       const data = await apiRequest(`books?limit=0&timestamp=${timestamp}`);
       
       if (!data.books || !Array.isArray(data.books)) {

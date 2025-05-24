@@ -204,7 +204,7 @@ const LoginPage = () => {
               
               <button 
                 type="submit" 
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-primary to-secondary hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:-translate-y-0.5"
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:-translate-y-0.5 shadow-lg"
                 disabled={loading}
               >
                 {loading ? (
@@ -236,7 +236,7 @@ const LoginPage = () => {
                 </button>
                 <button 
                   onClick={showAdminLoginDialog} 
-                  className="flex justify-center items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-green-600 to-green-700 hover:shadow-lg transition-all transform hover:-translate-y-0.5"
+                  className="flex justify-center items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 hover:shadow-lg transition-all transform hover:-translate-y-0.5"
                 >
                   <i className="fas fa-bolt mr-2"></i> Quick Admin Login
                 </button>
@@ -249,7 +249,7 @@ const LoginPage = () => {
                     <p className="text-amber-600 font-medium mb-3">Having trouble logging in?</p>
                     <button
                       onClick={handleFallbackLogin}
-                      className="w-full py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors flex items-center justify-center"
+                      className="w-full py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors flex items-center justify-center shadow-md hover:shadow-lg"
                     >
                       <i className="fas fa-door-open mr-2"></i>
                       Bypass Login (Demo Mode)

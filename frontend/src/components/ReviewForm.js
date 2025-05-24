@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import AuthContext from '../context/AuthContext';
+import { apiRequest } from '../services/apiConfig';
 import './ReviewForm.css';
 
 const ReviewForm = ({ bookId, onReviewAdded }) => {
@@ -35,24 +36,15 @@ const ReviewForm = ({ bookId, onReviewAdded }) => {
     try {
       setSubmitting(true);
       
-      const response = await fetch('/api/reviews', {
+      const data = await apiRequest('reviews', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${userInfo.token}`,
-        },
+        token: userInfo.token,
         body: JSON.stringify({
           rating,
           comment,
           bookId,
         }),
       });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to submit review');
-      }
       
       // Reset form fields
       setRating(0);
@@ -63,7 +55,7 @@ const ReviewForm = ({ bookId, onReviewAdded }) => {
       
       toast.success('Review submitted successfully!');
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || 'Failed to submit review');
     } finally {
       setSubmitting(false);
     }

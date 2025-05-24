@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import AuthContext from '../context/AuthContext';
+import { apiRequest } from '../services/apiConfig';
 import './AddBookPage.css'; // Reuse the same CSS
 
 const EditBookPage = () => {
@@ -27,8 +28,8 @@ const EditBookPage = () => {
   // Check for admin status
   useEffect(() => {
     if (!userInfo || !userInfo.isAdmin) {
-      toast.error('Not authorized as admin');
-      navigate('/login');
+      toast.error('You are not authorized to access this page');
+      navigate('/');
     }
   }, [userInfo, navigate]);
 
@@ -37,31 +38,31 @@ const EditBookPage = () => {
     const fetchBook = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/books/${id}`);
         
-        if (!response.ok) {
-          throw new Error('Book not found');
-        }
+        const data = await apiRequest(`books/${id}`);
         
-        const data = await response.json();
-        setTitle(data.title);
-        setAuthor(data.author);
+        setTitle(data.title || '');
+        setAuthor(data.author || '');
         setGenre(data.genre || '');
-        setDescription(data.description);
+        setDescription(data.description || '');
         setPublishedYear(data.publishedYear?.toString() || '');
         setCoverImage(data.coverImage || '');
-        setFeatured(!!data.featured);
+        setFeatured(data.featured || false);
         
+        setError(null);
       } catch (err) {
-        setError(err.message);
-        toast.error(err.message);
+        console.error('Error fetching book:', err);
+        setError('Failed to fetch book details. Please try again.');
+        toast.error('Failed to fetch book details');
       } finally {
         setLoading(false);
       }
     };
     
-    fetchBook();
-  }, [id]);
+    if (id && userInfo?.token) {
+      fetchBook();
+    }
+  }, [id, userInfo]);
 
   // Submit with proper authentication
   const handleSubmit = async (e) => {
@@ -73,54 +74,64 @@ const EditBookPage = () => {
       return;
     }
     
-    // Ensure we have authentication
-    if (!userInfo || !userInfo.token) {
-      toast.error('Authentication required');
-      navigate('/login');
-      return;
-    }
-    
     try {
       setSubmitting(true);
       
-      const response = await fetch(`/api/books/${id}`, {
+      await apiRequest(`books/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${userInfo.token}`
+          Authorization: `Bearer ${userInfo.token}`,
         },
         body: JSON.stringify({
           title,
           author,
           genre,
           description,
-          publishedYear: Number(publishedYear),
+          publishedYear,
           coverImage,
-          featured
-        })
+          featured,
+        }),
       });
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update book');
-      }
-      
       toast.success('Book updated successfully');
-      navigate(`/books/${id}`);
-    } catch (error) {
-      console.error('Update error:', error);
-      toast.error(error.message || 'Update failed');
+      navigate('/admin/dashboard');
+    } catch (err) {
+      console.error('Error updating book:', err);
+      toast.error('Failed to update book');
     } finally {
       setSubmitting(false);
     }
   };
   
   if (loading) {
-    return <div className="loading">Loading book details...</div>;
+    return (
+      <div className="add-book-page">
+        <div className="add-book-container">
+          <div className="flex justify-center items-center py-10">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+          </div>
+        </div>
+      </div>
+    );
   }
   
   if (error) {
-    return <div className="error">{error}</div>;
+    return (
+      <div className="add-book-page">
+        <div className="add-book-container">
+          <div className="text-center py-10">
+            <div className="text-red-600 mb-4">{error}</div>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-blue-600 text-white rounded"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
   
   return (
