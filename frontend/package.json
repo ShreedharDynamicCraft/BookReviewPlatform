@@ -23,10 +23,7 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "extends": []
   },
   "browserslist": {
     "production": [
@@ -40,19 +37,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5000",
-  "overrides": {
-    "sourcemap-codec": "npm:@jridgewell/sourcemap-codec",
-    "glob": "^9.3.5",
-    "svgo": "^3.0.2",
-    "workbox-cacheable-response": "^7.0.0",
-    "@humanwhocodes/config-array": "npm:@eslint/config-array",
-    "@humanwhocodes/object-schema": "npm:@eslint/object-schema",
-    "rimraf": "^5.0.1"
-  },
-  "resolutions": {
-    "glob": "^9.3.5",
-    "@humanwhocodes/config-array": "npm:@eslint/config-array",
-    "@humanwhocodes/object-schema": "npm:@eslint/object-schema"
-  }
+  "proxy": "http://localhost:5000"
 }

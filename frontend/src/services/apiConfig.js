@@ -35,6 +35,7 @@ export const apiRequest = async (endpoint, options = {}, token = null) => {
   };
   
   try {
+    console.log(`API request to: ${url}`);
     const response = await fetch(url, {
       ...options,
       headers

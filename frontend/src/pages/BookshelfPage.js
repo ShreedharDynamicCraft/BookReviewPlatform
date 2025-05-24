@@ -3,32 +3,13 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import AuthContext from '../context/AuthContext';
+import { apiRequest } from '../services/apiConfig';
 
 const BookshelfPage = () => {
   const { userInfo, toggleBookLike } = useContext(AuthContext);
   const [likedBooks, setLikedBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Function to properly handle API requests with better error handling
-  const fetchFromAPI = async (url) => {
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      // Try to parse error as JSON first
-      try {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to fetch data');
-      } catch (jsonError) {
-        // If JSON parsing fails, use text
-        const errorText = await response.text();
-        throw new Error(`Server error: ${response.status} - ${errorText.substring(0, 100)}...`);
-      }
-    }
-    
-    // Successful response, parse as JSON
-    return response.json();
-  };
 
   useEffect(() => {
     const fetchLikedBooks = async () => {
@@ -40,16 +21,11 @@ const BookshelfPage = () => {
 
       try {
         setLoading(true);
-        // Use the fully qualified URL to avoid proxy issues
         const ids = userInfo.likedBooks.join(',');
         console.log("Fetching books with IDs:", ids);
         
-        // Use our improved fetch function
-        const baseUrl = process.env.REACT_APP_API_URL || '';
-        const url = `${baseUrl}/api/bookshelf?ids=${ids}`;
-        console.log("API URL:", url);
-        
-        const data = await fetchFromAPI(url);
+        // Use apiRequest utility with the configured API URL
+        const data = await apiRequest(`bookshelf?ids=${ids}`);
         console.log("Books fetched:", data);
         setLikedBooks(data);
       } catch (err) {

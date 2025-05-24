@@ -119,29 +119,31 @@ After running the seeder script, a default admin account is created:
 
 ## Deployment
 
-### Backend Deployment (Heroku)
-1. Create a Heroku account and install Heroku CLI
-2. Log in to Heroku from the terminal:
+### Backend Deployment (Vercel)
+1. Create a Vercel account and install Vercel CLI
+2. Log in to Vercel from the terminal:
    ```bash
-   heroku login
+   npm i -g vercel
+   vercel login
    ```
-3. Create a new Heroku app:
+3. Deploy the backend:
    ```bash
-   heroku create your-app-name
+   cd backend
+   vercel
    ```
-4. Set environment variables:
-   ```bash
-   heroku config:set MONGODB_URI=your_mongodb_uri JWT_SECRET=your_jwt_secret NODE_ENV=production
-   ```
-5. Deploy the application:
-   ```bash
-   git add .
-   git commit -m "Deploy to Heroku"
-   git push heroku main
-   ```
+4. Set up environment variables in the Vercel dashboard:
+   - `MONGODB_URI` - Your MongoDB connection string
+   - `JWT_SECRET` - Your JWT secret key
+   - `NODE_ENV` - Set to "production"
+   
+5. Configure backend URL in frontend:
+   - Update `REACT_APP_API_URL` in `frontend/.env` to match your Vercel deployment URL
 
 ### Frontend Deployment (Netlify/Vercel)
-1. Update the proxy in `frontend/package.json` to your deployed backend URL
+1. Update the API URL in `frontend/.env`:
+   ```
+   REACT_APP_API_URL=https://your-vercel-app.vercel.app/api
+   ```
 2. Build the frontend:
    ```bash
    cd frontend
@@ -177,26 +179,6 @@ book-review-platform/
 
 ## API Documentation
 
-### Books Endpoints
+### Backend API URL
 
-- `GET /api/books` - Get all books (with pagination)
-- `GET /api/books/:id` - Get a specific book
-- `POST /api/books` - Add a new book (admin only)
-- `PUT /api/books/:id/like` - Like or unlike a book
-
-### Bookshelf Endpoints
-
-- `GET /api/bookshelf` - Get multiple books by IDs (for bookshelf feature)
-
-### Reviews Endpoints
-
-- `GET /api/reviews` - Get reviews for a book
-- `POST /api/reviews` - Submit a new review
-- `PUT /api/reviews/:id/like` - Like or unlike a review
-
-### Users Endpoints
-
-- `POST /api/users/register` - Register a new user
-- `POST /api/users/login` - Login a user
-- `GET /api/users/:id` - Get user profile
-- `PUT /api/users/:id` - Update user profile
+The backend API is hosted at:
